@@ -1,0 +1,17 @@
+%% Feel free to use, reuse and abuse the code in this file.
+
+{application, facebook_listener, [
+	{description, "Facebook listener application."},
+	{vsn, "1"},
+	{modules, []},
+	{registered, [facebook_listener_sup]},
+	{applications, [
+		kernel,
+		stdlib,
+		cowboy,
+        jsx,
+        lager
+	]},
+	{mod, {facebook_listener_app, []}},
+	{env, [{http_port, 8080}]}
+]}.
