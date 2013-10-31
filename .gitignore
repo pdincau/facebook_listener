@@ -1,3 +1,5 @@
+.erlang.mk.*
 deps/*
 _rel/*
 ebin/*
+logs/*
