@@ -55,9 +55,9 @@ init_dispatch(Config) ->
     cowboy_router:compile([{"localhost", [{"/", toppage_handler, []}]}]).
 
 callback_with_missing_params(_Config) ->
-    {ok, {{"HTTP/1.1", 404, "Not Found"}, _Headers, _Body}} = httpc:request(get, {"http://localhost:8080", []}, [], []),
+    {ok, {{_, 404, _}, _, _}} = httpc:request(get, {"http://localhost:8080", []}, [], []),
     ok.
 
 callback_with_expected_params(_Config) ->
-    {ok, {{"HTTP/1.1", 200, "OK"}, _Headers, "mychallenge"}} = httpc:request(get, {"http://localhost:8080/?hub.mode=subscribe&hub.verify_token=token&hub.challenge=mychallenge", []}, [], []),
+    {ok, {{_, 200, _}, _, "mychallenge"}} = httpc:request(get, {"http://localhost:8080/?hub.mode=subscribe&hub.verify_token=token&hub.challenge=mychallenge", []}, [], []),
     ok.
