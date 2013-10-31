@@ -18,7 +18,7 @@
          update_with_content_type_json/1]).
 
 -define(BASE_URL, "http://localhost:8080").
--define(JSON_UPDATE, "{\"id\":1}").
+-define(JSON_UPDATE, "{\"object\":\"user\",\"entry\":[{\"uid\":1335845740,\"changed_fields\":[\"name\",\"picture\"],\"time\":232323},{\"uid\":1234,\"changed_fields\":[\"friends\"],\"time\":232325}]}").
 -define(CALLBACK_PARAMS, "?hub.mode=subscribe&hub.verify_token=token&hub.challenge=mychallenge").
 
 %% ct.
