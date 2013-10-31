@@ -12,14 +12,25 @@
 
 %% Tests.
 -export([callback_with_expected_params/1,
-         callback_with_missing_params/1]).
+         callback_with_missing_params/1,
+         update_without_body/1,
+         update_with_wrong_content_type/1,
+         update_with_content_type_json/1]).
+
+-define(BASE_URL, "http://localhost:8080").
+-define(JSON_UPDATE, "{\"id\":1}").
+-define(CALLBACK_PARAMS, "?hub.mode=subscribe&hub.verify_token=token&hub.challenge=mychallenge").
 
 %% ct.
 all() ->
     [{group, http}].
 
 groups() ->
-    Tests = [callback_with_expected_params, callback_with_missing_params],
+    Tests = [callback_with_expected_params,
+             callback_with_missing_params,
+             update_without_body,
+             update_with_wrong_content_type,
+             update_with_content_type_json],
     [{http, [parallel], Tests}].
 
 init_per_suite(Config) ->
@@ -55,9 +66,21 @@ init_dispatch(Config) ->
     cowboy_router:compile([{"localhost", [{"/", toppage_handler, []}]}]).
 
 callback_with_missing_params(_Config) ->
-    {ok, {{_, 404, _}, _, _}} = httpc:request(get, {"http://localhost:8080", []}, [], []),
+    {ok, {{_, 404, _}, _, _}} = httpc:request(get, {?BASE_URL, []}, [], []),
     ok.
 
 callback_with_expected_params(_Config) ->
-    {ok, {{_, 200, _}, _, "mychallenge"}} = httpc:request(get, {"http://localhost:8080/?hub.mode=subscribe&hub.verify_token=token&hub.challenge=mychallenge", []}, [], []),
+    {ok, {{_, 200, _}, _, "mychallenge"}} = httpc:request(get, {?BASE_URL ++ ?CALLBACK_PARAMS, []}, [], []),
+    ok.
+
+update_without_body(_Config) ->
+    {ok, {{_, 404, _}, _, _}} = httpc:request(post, {?BASE_URL, [], "", ""}, [], []),
+    ok.
+
+update_with_wrong_content_type(_Config) ->
+    {ok, {{_, 404, _}, _, _}} = httpc:request(post, {?BASE_URL, [], "text/plain", ""}, [], []),
+    ok.
+
+update_with_content_type_json(_Config) ->
+    {ok, {{_, 200, _}, _, _}} = httpc:request(post, {?BASE_URL, [], "application/json", ?JSON_UPDATE}, [], []),
     ok.
