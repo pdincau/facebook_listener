@@ -50,12 +50,10 @@ end_per_suite(_Config) ->
     ok.
 
 init_per_group(http, Config) ->
-    Transport = ranch_tcp,
     {ok, _} = cowboy:start_http(http, 100, [{port, 8080}], [
             {env, [{dispatch, init_dispatch(Config)}]},
             {max_keepalive, 50},
             {timeout, 500}]),
-    Port = ranch:get_port(http),
     [Config].
 
 end_per_group(http, _Config) ->
