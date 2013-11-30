@@ -3,3 +3,4 @@ deps/*
 _rel/*
 ebin/*
 logs/*
+relx

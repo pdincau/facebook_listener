@@ -24,7 +24,7 @@ export PKG_FILE
 PKG_FILE_URL ?= https://raw.github.com/extend/erlang.mk/master/packages.v1.tsv
 
 define get_pkg_file
-	wget -O $(PKG_FILE) $(PKG_FILE_URL)
+	wget -O $(PKG_FILE) $(PKG_FILE_URL) || rm $(PKG_FILE)
 endef
 
 # Verbosity and tweaks.
@@ -46,8 +46,35 @@ dtl_verbose = $(dtl_verbose_$(V))
 gen_verbose_0 = @echo " GEN   " $@;
 gen_verbose = $(gen_verbose_$(V))
 
-.PHONY: all clean-all app clean deps clean-deps docs clean-docs \
-	build-tests tests build-plt dialyze
+.PHONY: rel clean-rel all clean-all app clean deps clean-deps \
+	docs clean-docs build-tests tests build-plt dialyze
+
+# Release.
+
+RELX_CONFIG ?= $(CURDIR)/relx.config
+
+ifneq ($(wildcard $(RELX_CONFIG)),)
+
+RELX ?= $(CURDIR)/relx
+export RELX
+
+RELX_URL ?= https://github.com/erlware/relx/releases/download/0.4.0/relx
+
+define get_relx
+	wget -O $(RELX) $(RELX_URL) || rm $(RELX)
+	chmod +x $(RELX)
+endef
+
+rel: clean-rel all $(RELX)
+	@$(RELX)
+
+$(RELX):
+	@$(call get_relx)
+
+clean-rel:
+	@rm -rf _rel
+
+endif
 
 # Deps directory.
 
@@ -65,7 +92,7 @@ ALL_TEST_DEPS_DIRS = $(addprefix $(DEPS_DIR)/,$(TEST_DEPS))
 ERL_LIBS ?= $(DEPS_DIR)
 export ERL_LIBS
 
-ERLC_OPTS ?= +debug_info +warn_export_all +warn_export_vars \
+ERLC_OPTS ?= -Werror +debug_info +warn_export_all +warn_export_vars \
 	+warn_shadow_vars +warn_obsolete_guard # +bin_opt_info +warn_missing_spec
 COMPILE_FIRST ?=
 COMPILE_FIRST_PATHS = $(addprefix src/,$(addsuffix .erl,$(COMPILE_FIRST)))
@@ -79,7 +106,7 @@ app: ebin/$(PROJECT).app
 	$(eval MODULES := $(shell find ebin -type f -name \*.beam \
 		| sed 's/ebin\///;s/\.beam/,/' | sed '$$s/.$$//'))
 	$(appsrc_verbose) cat src/$(PROJECT).app.src \
-		| sed 's/{modules, \[\]}/{modules, \[$(MODULES)\]}/' \
+		| sed 's/{modules,\s*\[\]}/{modules, \[$(MODULES)\]}/' \
 		> ebin/$(PROJECT).app
 
 define compile_erl
@@ -152,7 +179,13 @@ deps: $(ALL_DEPS_DIRS)
 	done
 
 clean-deps:
-	@for dep in $(ALL_DEPS_DIRS) ; do $(MAKE) -C $$dep clean; done
+	@for dep in $(ALL_DEPS_DIRS) ; do \
+		if [ -f $$dep/Makefile ] ; then \
+			$(MAKE) -C $$dep clean ; \
+		else \
+			echo "include $(CURDIR)/erlang.mk" | $(MAKE) -f - -C $$dep clean ; \
+		fi ; \
+	done
 
 # Documentation.
 
