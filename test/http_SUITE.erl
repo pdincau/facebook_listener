@@ -33,7 +33,7 @@ groups() ->
              update_with_content_type_json],
     [{http, [parallel], Tests}].
 
-init_per_suite(Config) ->
+init_per_suite(_Config) ->
     application:start(crypto),
     application:start(cowlib),
     application:start(ranch),
@@ -60,7 +60,7 @@ end_per_group(http, _Config) ->
     ok.
 
 %% Dispatch configuration.
-init_dispatch(Config) ->
+init_dispatch(_Config) ->
     cowboy_router:compile([{"localhost", [{"/", toppage_handler, []}]}]).
 
 callback_with_missing_params(_Config) ->

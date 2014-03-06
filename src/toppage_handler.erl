@@ -13,7 +13,7 @@
 -define(VERIFICATION_TOKEN, <<"token">>).
 
 init(_Transport, Req, []) ->
-	{ok, Req, undefined}.
+    {ok, Req, undefined}.
 
 handle(Req, State) ->
     {Method, Req2} = cowboy_req:method(Req),
@@ -24,8 +24,8 @@ reply(<<"GET">>, Req) ->
     {Mode, Req2} = cowboy_req:qs_val(<<"hub.mode">>, Req),
     {VerifyToken, Req3} = cowboy_req:qs_val(<<"hub.verify_token">>, Req2),
     {Challenge, Req4} = cowboy_req:qs_val(<<"hub.challenge">>, Req3),
-    
-    lager:info("Handling get request with params:~nmode: ~s,~nverify token: ~s,~nchallenge: ~s", [Mode, VerifyToken, Challenge]),
+
+    lager:info("Handling request with params:~nmode: ~s,~nverify token: ~s,~nchallenge: ~s", [Mode, VerifyToken, Challenge]),
     case {Mode, VerifyToken, Challenge} of
         {_, _, undefined} ->
             lager:warning("Parameter 'hub.challenge' missing during subscription call from Facebook"),
@@ -49,7 +49,7 @@ reply(<<"POST">>, Req) ->
     end;
 
 reply(_, Req) ->
-	%% Method not allowed.
+    %% Method not allowed.
     lager:warning("Wrong HTTP request received"),
     cowboy_req:reply(405, Req).
 
