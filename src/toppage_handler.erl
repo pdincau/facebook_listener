@@ -61,9 +61,9 @@ handle_post_with_body(Req) ->
     case is_valid(XHubSignature, Payload) of
         true ->
             %% Converting Paylod from json to erlang internal structure
-            FacebookUpdate = jsx:decode(PostVal),
+            FacebookUpdate = jsx:decode(Payload),
             lager:info("Received request is facebook update: ~p", [FacebookUpdate]),
-            cowboy_req:reply(200, [], <<"">>, Req);
+            cowboy_req:reply(200, [], <<"">>, Req3);
         false ->
             lager:warning("Update notification with invalid signature received."),
             cowboy_req:reply(404, Req)
@@ -71,7 +71,7 @@ handle_post_with_body(Req) ->
 
 is_valid(XHubSignature, Payload) ->
     <<Mac:160/integer>> = crypto:hmac(sha, ?APP_SECRET, Payload),
-    Signature = lists:flatten(io_lib:format("~40.16.0b", [Mac]))
+    Signature = lists:flatten(io_lib:format("~40.16.0b", [Mac])),
     Signature =:= XHubSignature.
 
 terminate(_Reason, _Req, _State) ->
