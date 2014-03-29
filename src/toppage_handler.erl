@@ -11,6 +11,7 @@
 
 -define(HUB_MODE, <<"subscribe">>).
 -define(VERIFICATION_TOKEN, <<"token">>).
+-define(APP_SECRET, <<"secret">>).
 
 init(_Transport, Req, []) ->
     {ok, Req, undefined}.
@@ -49,33 +50,29 @@ reply(<<"POST">>, Req) ->
     end;
 
 reply(_, Req) ->
-    %% Method not allowed.
-    lager:warning("Wrong HTTP request received"),
+    lager:warning("HTTP request with invalid method received"),
     cowboy_req:reply(405, Req).
 
 handle_post_with_body(Req) ->
-    {Signature, Req2} = cowboy_req:header(<<"X-Hub-Signature">>, Req),
-    case is_valid(Signature) of
-        true ->
-            {ok, PostVals, Req3} = cowboy_req:body_qs(Req2),
-            handle_post_body(Req3, PostVals);
-        false ->
-            lager:warning("Update notification with wrong content-type"),
-            cowboy_req:reply(404, Req)
-    end.
+    {XHubSignature, Req2} = cowboy_req:header(<<"X-Hub-Signature">>, Req),
+    {ok, [{Payload, true}], Req3} = cowboy_req:body_qs(Req2),
+    lager:info("Received update: ~p", [Payload]),
 
-handle_post_body(Req, PostVals) ->
-    case PostVals of
-        [{PostVal, true}] ->
+    case is_valid(XHubSignature, Payload) of
+        true ->
+            %% Converting Paylod from json to erlang internal structure
             FacebookUpdate = jsx:decode(PostVal),
             lager:info("Received request is facebook update: ~p", [FacebookUpdate]),
             cowboy_req:reply(200, [], <<"">>, Req);
-        _ ->
-            lager:warning("Post request received has more than one parameter"),
+        false ->
+            lager:warning("Update notification with invalid signature received."),
             cowboy_req:reply(404, Req)
     end.
 
-is_valid(_Signature) -> true.
+is_valid(XHubSignature, Payload) ->
+    <<Mac:160/integer>> = crypto:hmac(sha, ?APP_SECRET, Payload),
+    Signature = lists:flatten(io_lib:format("~40.16.0b", [Mac]))
+    Signature =:= XHubSignature.
 
 terminate(_Reason, _Req, _State) ->
     ok.
