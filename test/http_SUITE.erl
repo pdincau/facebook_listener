@@ -14,7 +14,6 @@
 -export([callback_with_expected_params/1,
          callback_with_missing_params/1,
          update_without_body/1,
-         update_with_wrong_content_type/1,
          update_with_content_type_json/1]).
 
 -define(BASE_URL, "http://localhost:8080").
@@ -73,10 +72,6 @@ callback_with_expected_params(_Config) ->
 
 update_without_body(_Config) ->
     {ok, {{_, 404, _}, _, _}} = httpc:request(post, {?BASE_URL, [], "", ""}, [], []),
-    ok.
-
-update_with_wrong_content_type(_Config) ->
-    {ok, {{_, 404, _}, _, _}} = httpc:request(post, {?BASE_URL, [], "text/plain", ""}, [], []),
     ok.
 
 update_with_content_type_json(_Config) ->
