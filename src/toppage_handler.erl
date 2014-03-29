@@ -11,6 +11,7 @@
 
 -define(HUB_MODE, <<"subscribe">>).
 -define(VERIFICATION_TOKEN, <<"token">>).
+-define(X_HUB_SIGNATURE, <<"X-Hub-Signature">>).
 
 init(_Transport, Req, []) ->
     {ok, Req, undefined}.
@@ -54,13 +55,12 @@ reply(_, Req) ->
     cowboy_req:reply(405, Req).
 
 handle_post_with_body(Req) ->
-    {ContentType, Req2} = cowboy_req:header(<<"content-type">>, Req),
-    lager:info("Post request received has content type: ~s", [ContentType]),
-    case ContentType of
-        <<"application/json">> ->
+    {Signature, Req2} = cowboy_req:header(?X_HUB_SIGNATURE, Req),
+    case is_valid(Signature) of
+        true ->
             {ok, PostVals, Req3} = cowboy_req:body_qs(Req2),
             handle_post_body(Req3, PostVals);
-        _ ->
+        false ->
             lager:warning("Update notification with wrong content-type"),
             cowboy_req:reply(404, Req)
     end.
@@ -68,19 +68,15 @@ handle_post_with_body(Req) ->
 handle_post_body(Req, PostVals) ->
     case PostVals of
         [{PostVal, true}] ->
-            case jsx:is_json(PostVal) of
-                true ->
-                    FacebookUpdate = jsx:decode(PostVal),
-                    lager:info("Received request is facebook update: ~p", [FacebookUpdate]),
-                    cowboy_req:reply(200, [], <<"">>, Req);
-                false ->
-                    lager:warning("Post request received is not a valid json"),
-                    cowboy_req:reply(404, Req)
-            end;
-        _Any ->
+            FacebookUpdate = jsx:decode(PostVal),
+            lager:info("Received request is facebook update: ~p", [FacebookUpdate]),
+            cowboy_req:reply(200, [], <<"">>, Req);
+        _ ->
             lager:warning("Post request received has more than one parameter"),
             cowboy_req:reply(404, Req)
     end.
+
+is_valid(_Signature) -> true.
 
 terminate(_Reason, _Req, _State) ->
     ok.
