@@ -11,7 +11,6 @@
 
 -define(HUB_MODE, <<"subscribe">>).
 -define(VERIFICATION_TOKEN, <<"token">>).
--define(X_HUB_SIGNATURE, <<"X-Hub-Signature">>).
 
 init(_Transport, Req, []) ->
     {ok, Req, undefined}.
@@ -55,7 +54,7 @@ reply(_, Req) ->
     cowboy_req:reply(405, Req).
 
 handle_post_with_body(Req) ->
-    {Signature, Req2} = cowboy_req:header(?X_HUB_SIGNATURE, Req),
+    {Signature, Req2} = cowboy_req:header(<<"X-Hub-Signature">>, Req),
     case is_valid(Signature) of
         true ->
             {ok, PostVals, Req3} = cowboy_req:body_qs(Req2),
