@@ -30,13 +30,13 @@ reply(<<"GET">>, Req) ->
     case {Mode, VerifyToken, Challenge} of
         {_, _, undefined} ->
             lager:warning("Parameter 'hub.challenge' missing during subscription call from Facebook"),
-            cowboy_req:reply(404, Req);
+            cowboy_req:reply(400, Req);
         {?HUB_MODE, ?VERIFICATION_TOKEN, Challenge} ->
             lager:info("Valid subscription received from Facebook"),
             cowboy_req:reply(200, [], Challenge, Req4);
         {_, _, _} ->
             lager:warning("Wrong parameters or missing paramenters during subscription call from Facebook"),
-            cowboy_req:reply(404, Req)
+            cowboy_req:reply(400, Req)
     end;
 
 reply(<<"POST">>, Req) ->
@@ -46,7 +46,7 @@ reply(<<"POST">>, Req) ->
             handle_post_with_body(Req);
         false ->
             lager:warning("Update notification without body received"),
-            cowboy_req:reply(404, Req)
+            cowboy_req:reply(400, Req)
     end;
 
 reply(_, Req) ->
@@ -66,7 +66,7 @@ handle_post_with_body(Req) ->
             cowboy_req:reply(200, [], <<"">>, Req3);
         false ->
             lager:warning("Update notification with invalid signature received."),
-            cowboy_req:reply(404, Req)
+            cowboy_req:reply(400, Req)
     end.
 
 is_valid(XHubSignature, Payload) ->
