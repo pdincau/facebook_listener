@@ -14,7 +14,8 @@
 -export([callback_with_expected_params/1,
          callback_with_missing_params/1,
          update_without_body/1,
-         update_with_content_type_json/1]).
+         update_with_valid_signature/1,
+         update_with_invalid_signature/1]).
 
 -define(BASE_URL, "http://localhost:8080").
 -define(SIGNATURE, "sha1=534985d2be5f2df69cae7cc5e23be204add4f499"). % for key "test"
@@ -29,7 +30,8 @@ groups() ->
     Tests = [callback_with_expected_params,
              callback_with_missing_params,
              update_without_body,
-             update_with_content_type_json],
+             update_with_valid_signature,
+             update_with_invalid_signature],
     [{http, [parallel], Tests}].
 
 init_per_suite(_Config) ->
@@ -74,6 +76,10 @@ update_without_body(_Config) ->
     {ok, {{_, 404, _}, _, _}} = httpc:request(post, {?BASE_URL, [], "", ""}, [], []),
     ok.
 
-update_with_content_type_json(_Config) ->
+update_with_valid_signature(_Config) ->
     {ok, {{_, 200, _}, _, _}} = httpc:request(post, {?BASE_URL, [{"x-hub-signature", ?SIGNATURE}], "application/json", ?JSON_UPDATE}, [], []),
+    ok.
+
+update_with_invalid_signature(_Config) ->
+    {ok, {{_, 404, _}, _, _}} = httpc:request(post, {?BASE_URL, [{"x-hub-signature", "invalid"}], "application/json", ?JSON_UPDATE}, [], []),
     ok.
