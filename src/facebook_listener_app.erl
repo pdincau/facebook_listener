@@ -14,15 +14,15 @@
 
 start(_StartType, _StartArgs) ->
     Routes = routes(),
-	Dispatch = cowboy_router:compile(Routes),
+    Dispatch = cowboy_router:compile(Routes),
     Port = port(),
     TransOpts = [{port, Port}],
     ProtoOpts = [{env, [{dispatch, Dispatch}]}],
-	{ok, _} = cowboy:start_http(http, ?C_ACCEPTORS, TransOpts, ProtoOpts),
-	facebook_listener_sup:start_link().
+    {ok, _} = cowboy:start_http(http, ?C_ACCEPTORS, TransOpts, ProtoOpts),
+    facebook_listener_sup:start_link().
 
 stop(_State) ->
-	ok.
+    ok.
 
 routes() ->
     [{'_', [{"/", toppage_handler, []}]}].
