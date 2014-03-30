@@ -54,7 +54,7 @@ reply(_, Req) ->
     cowboy_req:reply(405, Req).
 
 handle_post_with_body(Req) ->
-    {XHubSignature, Req2} = cowboy_req:header(<<"X-Hub-Signature">>, Req),
+    {XHubSignature, Req2} = cowboy_req:header(<<"x-hub-signature">>, Req),
     {ok, [{Payload, true}], Req3} = cowboy_req:body_qs(Req2),
     lager:info("Received update: ~p", [Payload]),
 
@@ -71,8 +71,8 @@ handle_post_with_body(Req) ->
 
 is_valid(XHubSignature, Payload) ->
     <<Mac:160/integer>> = crypto:hmac(sha, ?APP_SECRET, Payload),
-    Signature = lists:flatten(io_lib:format("~40.16.0b", [Mac])),
-    Signature =:= XHubSignature.
+    Signature = lists:flatten(io_lib:format("sha1=~40.16.0b", [Mac])),
+    binary_to_list(XHubSignature) =:= Signature.
 
 terminate(_Reason, _Req, _State) ->
     ok.
