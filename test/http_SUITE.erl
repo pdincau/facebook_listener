@@ -65,7 +65,7 @@ init_dispatch(_Config) ->
     cowboy_router:compile([{"localhost", [{"/", update_handler, []}]}]).
 
 callback_with_missing_params(_Config) ->
-    {ok, {{_, 404, _}, _, _}} = httpc:request(get, {?BASE_URL, []}, [], []),
+    {ok, {{_, 400, _}, _, _}} = httpc:request(get, {?BASE_URL, []}, [], []),
     ok.
 
 callback_with_expected_params(_Config) ->
@@ -73,7 +73,7 @@ callback_with_expected_params(_Config) ->
     ok.
 
 update_without_body(_Config) ->
-    {ok, {{_, 404, _}, _, _}} = httpc:request(post, {?BASE_URL, [], "", ""}, [], []),
+    {ok, {{_, 400, _}, _, _}} = httpc:request(post, {?BASE_URL, [], "", ""}, [], []),
     ok.
 
 update_with_valid_signature(_Config) ->
@@ -81,5 +81,5 @@ update_with_valid_signature(_Config) ->
     ok.
 
 update_with_invalid_signature(_Config) ->
-    {ok, {{_, 404, _}, _, _}} = httpc:request(post, {?BASE_URL, [{"x-hub-signature", "invalid"}], "application/json", ?JSON_UPDATE}, [], []),
+    {ok, {{_, 400, _}, _, _}} = httpc:request(post, {?BASE_URL, [{"x-hub-signature", "invalid"}], "application/json", ?JSON_UPDATE}, [], []),
     ok.
