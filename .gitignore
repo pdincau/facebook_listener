@@ -4,3 +4,4 @@ _rel/*
 ebin/*
 logs/*
 relx
+test/*.beam
