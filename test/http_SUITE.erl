@@ -17,6 +17,7 @@
          update_with_content_type_json/1]).
 
 -define(BASE_URL, "http://localhost:8080").
+-define(SIGNATURE, "sha1=534985d2be5f2df69cae7cc5e23be204add4f499"). % for key "test"
 -define(JSON_UPDATE, "{\"object\":\"user\",\"entry\":[{\"uid\":1335845740,\"changed_fields\":[\"name\",\"picture\"],\"time\":232323},{\"uid\":1234,\"changed_fields\":[\"friends\"],\"time\":232325}]}").
 -define(CALLBACK_PARAMS, "?hub.mode=subscribe&hub.verify_token=token&hub.challenge=mychallenge").
 
@@ -28,7 +29,6 @@ groups() ->
     Tests = [callback_with_expected_params,
              callback_with_missing_params,
              update_without_body,
-             update_with_wrong_content_type,
              update_with_content_type_json],
     [{http, [parallel], Tests}].
 
@@ -60,7 +60,7 @@ end_per_group(http, _Config) ->
 
 %% Dispatch configuration.
 init_dispatch(_Config) ->
-    cowboy_router:compile([{"localhost", [{"/", toppage_handler, []}]}]).
+    cowboy_router:compile([{"localhost", [{"/", update_handler, []}]}]).
 
 callback_with_missing_params(_Config) ->
     {ok, {{_, 404, _}, _, _}} = httpc:request(get, {?BASE_URL, []}, [], []),
@@ -75,5 +75,5 @@ update_without_body(_Config) ->
     ok.
 
 update_with_content_type_json(_Config) ->
-    {ok, {{_, 200, _}, _, _}} = httpc:request(post, {?BASE_URL, [], "application/json", ?JSON_UPDATE}, [], []),
+    {ok, {{_, 200, _}, _, _}} = httpc:request(post, {?BASE_URL, [{"x-hub-signature", ?SIGNATURE}], "application/json", ?JSON_UPDATE}, [], []),
     ok.
