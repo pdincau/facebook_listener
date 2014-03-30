@@ -76,3 +76,10 @@ is_valid(XHubSignature, Payload) ->
 
 terminate(_Reason, _Req, _State) ->
     ok.
+
+-ifdef(TEST).
+
+is_valid_test() ->
+        1 = 1.
+
+-endif.
