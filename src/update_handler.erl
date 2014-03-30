@@ -1,7 +1,7 @@
 %% Feel free to use, reuse and abuse the code in this file.
 
 %% @doc Facebook Real-time updates handler.
--module(toppage_handler).
+-module(update_handler).
 
 -compile([{parse_transform, lager_transform}]).
 
