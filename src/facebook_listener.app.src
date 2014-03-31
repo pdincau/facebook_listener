@@ -11,6 +11,7 @@
 		cowboy,
 		crypto,
 		jsx,
+        inets,
  		lager
 	]},
 	{mod, {facebook_listener_app, []}},

@@ -63,6 +63,10 @@ handle_post_with_body(Req) ->
             %% Converting Paylod from json to erlang internal structure
             FacebookUpdate = jsx:decode(Payload),
             lager:info("Received request is facebook update: ~p", [FacebookUpdate]),
+
+            %% Spawning a process that in the future will do the actual request
+            spawn(fun() -> activity_fetcher:get_activities() end),
+
             cowboy_req:reply(200, [], <<"">>, Req3);
         false ->
             lager:warning("Update notification with invalid signature received."),
