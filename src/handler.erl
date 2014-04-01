@@ -54,6 +54,7 @@ reply(_, Req) ->
     cowboy_req:reply(405, Req).
 
 %% http://localhost:5498/facebook/<app_name>
+%% need to add /facebook on route but this will break get request
 handle_post_with_body(Req) ->
     {XHubSignature, Req2} = cowboy_req:header(<<"x-hub-signature">>, Req),
     {ok, [{Payload, true}], Req3} = cowboy_req:body_qs(Req2),
@@ -67,6 +68,7 @@ handle_post_with_body(Req) ->
 
             %% Extract application name from URL path
             {AppName, Req4} = cowboy_req:binding(app_name, Req3),
+            lager:info("App name is: ~s", [AppName]),
 
             %% Spawning a process that in the future will do the actual request
             spawn(fun() -> fetcher:fetch(AppName) end),
