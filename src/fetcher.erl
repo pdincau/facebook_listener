@@ -7,18 +7,16 @@
 fetch(AppName) ->
     Address = lists:concat(["http://www.gazzetta.it/", binary_to_list(AppName)]),
 
-    %% Handling only positive case, should we care for not successful requests?
-    %% See how gcm-erlang handles this
+    case httpc:request(Address) of
+        {ok, {{_, 200, _}, _Headers, Body}} ->
+            %% For now I just log the title of a generic web page
+            Title = extract_title(Body),
+            lager:info("The webpage title is: ~p", [Title]);
+        Error ->
+            lager:warning("Could fetch from url: ~p~n. Response was: ~p", [Error])
+    end.
 
-    {ok, Result} = httpc:request(Address),
-    {{_, 200, _}, _Headers, Body} = Result,
-
-
-    %% For now I just log the title of a generic web page
-    Title = extract_title(Body),
-    lager:info("The webpage title is: ~p", [Title]).
-
-    extract_title(Text) ->
+extract_title(Text) ->
     A = string:str(Text, "<title>"),
     B = string:str(Text, "</title>"),
     string:substr(Text, A+7, B-A-7).
