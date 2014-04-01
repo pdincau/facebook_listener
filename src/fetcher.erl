@@ -2,10 +2,10 @@
 
 -compile([{parse_transform, lager_transform}]).
 
--export([fetch/0]).
+-export([fetch/1]).
 
-fetch() ->
-    Address = "http://www.gazzetta.it",
+fetch(AppName) ->
+    Address = lists:concat(["http://www.gazzetta.it/", binary_to_list(AppName)]),
 
     %% Handling only positive case, should we care for not successful requests?
     %% See how gcm-erlang handles this

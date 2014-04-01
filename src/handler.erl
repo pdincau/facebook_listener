@@ -53,6 +53,7 @@ reply(_, Req) ->
     lager:warning("HTTP request with invalid method received"),
     cowboy_req:reply(405, Req).
 
+%% http://localhost:5498/facebook/<app_name>
 handle_post_with_body(Req) ->
     {XHubSignature, Req2} = cowboy_req:header(<<"x-hub-signature">>, Req),
     {ok, [{Payload, true}], Req3} = cowboy_req:body_qs(Req2),
@@ -64,10 +65,13 @@ handle_post_with_body(Req) ->
             FacebookUpdate = jsx:decode(Payload),
             lager:info("Received request is facebook update: ~p", [FacebookUpdate]),
 
-            %% Spawning a process that in the future will do the actual request
-            spawn(fun() -> fetcher:fetch() end),
+            %% Extract application name from URL path
+            {AppName, Req4} = cowboy_req:binding(app_name, Req3),
 
-            cowboy_req:reply(200, [], <<"">>, Req3);
+            %% Spawning a process that in the future will do the actual request
+            spawn(fun() -> fetcher:fetch(AppName) end),
+
+            cowboy_req:reply(200, [], <<"">>, Req4);
         false ->
             lager:warning("Update notification with invalid signature received."),
             cowboy_req:reply(400, Req)
