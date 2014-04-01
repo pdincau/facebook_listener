@@ -25,7 +25,7 @@ stop(_State) ->
     ok.
 
 routes() ->
-    [{'_', [{"/", update_handler, []}]}].
+    [{'_', [{"/", handler, []}]}].
 
 port() ->
     case os:getenv("PORT") of

@@ -1,7 +1,7 @@
 %% Feel free to use, reuse and abuse the code in this file.
 
 %% @doc Facebook Real-time updates handler.
--module(update_handler).
+-module(handler).
 
 -compile([{parse_transform, lager_transform}]).
 
@@ -65,7 +65,7 @@ handle_post_with_body(Req) ->
             lager:info("Received request is facebook update: ~p", [FacebookUpdate]),
 
             %% Spawning a process that in the future will do the actual request
-            spawn(fun() -> activity_fetcher:get_activities() end),
+            spawn(fun() -> fetcher:fetch() end),
 
             cowboy_req:reply(200, [], <<"">>, Req3);
         false ->

@@ -1,10 +1,10 @@
--module(activity_fetcher).
+-module(fetcher).
 
 -compile([{parse_transform, lager_transform}]).
 
--export([get_activities/0]).
+-export([fetch/0]).
 
-get_activities() ->
+fetch() ->
     Address = "http://www.gazzetta.it",
 
     %% Handling only positive case, should we care for not successful requests?

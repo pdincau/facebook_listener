@@ -62,7 +62,7 @@ end_per_group(http, _Config) ->
 
 %% Dispatch configuration.
 init_dispatch(_Config) ->
-    cowboy_router:compile([{"localhost", [{"/", update_handler, []}]}]).
+    cowboy_router:compile([{"localhost", [{"/", handler, []}]}]).
 
 callback_with_missing_params(_Config) ->
     {ok, {{_, 400, _}, _, _}} = httpc:request(get, {?BASE_URL, []}, [], []),
