@@ -54,7 +54,6 @@ reply(_, Req) ->
     cowboy_req:reply(405, Req).
 
 %% http://localhost:5498/facebook/<app_name>
-%% need to add /facebook on route but this will break get request
 handle_post_with_body(Req) ->
     {XHubSignature, Req2} = cowboy_req:header(<<"x-hub-signature">>, Req),
     {ok, [{Payload, true}], Req3} = cowboy_req:body_qs(Req2),
