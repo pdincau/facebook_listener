@@ -34,12 +34,15 @@ do_fetch(Address) ->
     end.
 
 entries_in(Update) ->
-    %% For now I just match 'user" object
-    [{<<"object">>, Object = <<"user">>}, {<<"entry">>, Entries}] = Update,
+    %% TODO: currently only updates with object 'user" are supported
+    case Update of
+        [{<<"object">>, Object = <<"user">>}, {<<"entry">>, Entries}] ->
+            lager:info("Extracted from update: ~p object: ~p and entries: ~p", [Update, Object, Entries]),
 
-    lager:info("Extracted from update: ~p object: ~p and entries: ~p", [Update, Object, Entries]),
-
-    [{UId, Fields, Timestamp} || [{<<"uid">>, UId}, {<<"changed_fields">>, Fields}, {<<"time">>, Timestamp}] <- Entries].
+            [{UId, Fields, Timestamp} || [{<<"uid">>, UId}, {<<"changed_fields">>, Fields}, {<<"time">>, Timestamp}] <- Entries];
+        _ ->
+            []
+    end.
 
 -ifdef(TEST).
     -compile(export_all).
