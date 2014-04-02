@@ -40,3 +40,7 @@ entries_in(Update) ->
     lager:info("Extracted from update: ~p object: ~p and entries: ~p", [Update, Object, Entries]),
 
     [{UId, Fields, Timestamp} || [{<<"uid">>, UId}, {<<"changed_fields">>, Fields}, {<<"time">>, Timestamp}] <- Entries].
+
+-ifdef(TEST).
+    -compile(export_all).
+-endif.
