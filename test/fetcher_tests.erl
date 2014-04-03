@@ -5,7 +5,7 @@ user_entries_test() ->
     Update = update_with_user_entries(),
     Entries = fetcher:entries_in(Update),
 
-    ?assertEqual([{1335845740, [<<"name">>,<<"picture">>], 232323}, {1234, [<<"friends">>], 232325}], Entries).
+    ?assertEqual([{<<"123456789">>, [<<"likes">>], 1396550005}], Entries).
 
 not_user_entries_test() ->
     Update = update_without_user_entries(),
@@ -14,8 +14,7 @@ not_user_entries_test() ->
     ?assertEqual([], Entries).
 
 update_with_user_entries() ->
-    [{<<"object">>,<<"user">>},{<<"entry">>,[[{<<"uid">>,1335845740},{<<"changed_fields">>,[<<"name">>,<<"picture">>]},{<<"time">>,232323}],[{<<"uid">>,1234},{<<"changed_fields">>,[<<"friends">>]},{<<"time">>,232325}]]}].
-
+    [{<<"object">>,<<"user">>},{<<"entry">>,[[{<<"uid">>,<<"123456789">>},{<<"id">>,<<"123456789">>},{<<"time">>,1396550005},{<<"changed_fields">>,[<<"likes">>]}]]}].
 
 update_without_user_entries() ->
-    [{<<"object">>,<<"page">>},{<<"entry">>,[[{<<"uid">>,1335845740},{<<"changed_fields">>,[<<"name">>,<<"picture">>]},{<<"time">>,232323}]]}].
+    [{<<"object">>,<<"page">>},{<<"entry">>,[[{<<"any">>,<<"any">>},{<<"any">>,<<"any">>},{<<"time">>,1396550005},{<<"changed_fields">>,[<<"anything">>]}]]}].
