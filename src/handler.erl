@@ -60,15 +60,12 @@ handle_post_with_body(Req) ->
 
     case is_valid(XHubSignature, Payload) of
         true ->
-            %% Converting Paylod from json to erlang internal structure
             Update = jsx:decode(Payload),
             lager:info("Received request is facebook update: ~p", [Update]),
 
-            %% Extract application name from URL path
             {AppName, Req4} = cowboy_req:binding(app_name, Req3),
             lager:info("App name is: ~s", [AppName]),
 
-            %% Spawning a process that in the future will do the actual request
             spawn(fun() -> fetcher:fetch(AppName, Update) end),
 
             cowboy_req:reply(200, [], <<"">>, Req4);
