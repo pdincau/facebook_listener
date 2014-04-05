@@ -12,9 +12,15 @@ fetch(AppName, Update) ->
     Results = [fetch_entry(AppName, UserId, Fields, Timestamp) || {UserId, Fields, Timestamp} <- Entries],
     lager:info("Results are: ~p", [Results]).
 
-access_token(_AppName, _UserId) ->
-    %% TODO: Implement token recovery here.
-    <<"securitytoken">>.
+entries_in(Update) ->
+    %% TODO: currently only updates with object 'user" are supported
+    case Update of
+        [{<<"object">>, Object = <<"user">>}, {<<"entry">>, Entries}] ->
+            lager:info("Extracted from update: ~p object: ~p and entries: ~p", [Update, Object, Entries]),
+            [{UId, Fields, Timestamp} ||  [{<<"uid">>, UId}, {<<"id">>, _Id}, {<<"time">>, Timestamp}, {<<"changed_fields">>, Fields}] <- Entries];
+        _ ->
+            []
+    end.
 
 fetch_entry(AppName, UserId, Fields, _Timestamp) ->
     Token = access_token(AppName, UserId),
@@ -27,15 +33,9 @@ fetch_entry(AppName, UserId, Fields, _Timestamp) ->
             lager:warning("Couldn't fetch from url: ~p~n. Response was: ~p", [Error])
     end.
 
-entries_in(Update) ->
-    %% TODO: currently only updates with object 'user" are supported
-    case Update of
-        [{<<"object">>, Object = <<"user">>}, {<<"entry">>, Entries}] ->
-            lager:info("Extracted from update: ~p object: ~p and entries: ~p", [Update, Object, Entries]),
-            [{UId, Fields, Timestamp} ||  [{<<"uid">>, UId}, {<<"id">>, _Id}, {<<"time">>, Timestamp}, {<<"changed_fields">>, Fields}] <- Entries];
-        _ ->
-            []
-    end.
+access_token(_AppName, _UserId) ->
+    %% TODO: Implement token recovery here.
+    <<"securitytoken">>.
 
 url_for(UserId, Fields, Token, Params) ->
     Url = binary:replace(?BASE_URL, <<"{objectid}">>, UserId),
