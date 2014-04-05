@@ -22,5 +22,5 @@ start_link() ->
 %% supervisor.
 
 init([]) ->
-    Procs = [],
+    Procs = [?CHILD(repository, worker)],
     {ok, {{one_for_one, 10, 10}, Procs}}.

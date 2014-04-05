@@ -33,9 +33,8 @@ fetch_entry(AppName, UserId, Fields, _Timestamp) ->
             lager:warning("Couldn't fetch from url: ~p~n. Response was: ~p", [Error])
     end.
 
-access_token(_AppName, _UserId) ->
-    %% TODO: Implement token recovery here.
-    <<"securitytoken">>.
+access_token(AppName, UserId) ->
+    repository:get_access_token(AppName, UserId).
 
 url_for(UserId, Fields, Token, Params) ->
     Url = binary:replace(?BASE_URL, <<"{objectid}">>, UserId),
