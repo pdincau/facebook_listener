@@ -36,7 +36,7 @@ groups() ->
 
 init_per_suite(_Config) ->
     application:start(inets),
-    %%application:start(facebook_listener),
+    application:start(facebook_listener),
     [].
 
 end_per_suite(_Config) ->
