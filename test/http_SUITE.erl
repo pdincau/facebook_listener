@@ -35,10 +35,6 @@ groups() ->
     [{http, [parallel], Tests}].
 
 init_per_suite(_Config) ->
-    application:start(crypto),
-    application:start(cowlib),
-    application:start(ranch),
-    application:start(cowboy),
     application:start(inets),
     application:start(facebook_listener),
     [].
@@ -46,10 +42,6 @@ init_per_suite(_Config) ->
 end_per_suite(_Config) ->
     application:stop(facebook_listener),
     application:stop(inets),
-    application:stop(cowboy),
-    application:stop(ranch),
-    application:stop(cowlib),
-    application:stop(crypto),
     ok.
 
 init_per_group(http, Config) ->
