@@ -4,5 +4,4 @@ _rel/*
 ebin/*
 logs/*
 relx
-prod.config
 test/*.beam
