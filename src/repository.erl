@@ -21,7 +21,7 @@ start_link() ->
 init([]) ->
     {ok, #state{}}.
 
-handle_call({access_token, {_AppName, _UserId}}, _From, #state{client=Client} = State) ->
+handle_call({access_token, {_AppName, _UserId}}, _From, #state{client=_Client} = State) ->
     Reply = <<"securitytoken">>,
     {reply, Reply, State};
 

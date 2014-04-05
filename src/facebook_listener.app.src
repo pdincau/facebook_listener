@@ -15,7 +15,8 @@
 		cowboy,
 		jsx,
         inets,
- 		lager
+ 		lager,
+        eredis
 	]},
 	{mod, {facebook_listener_app, []}},
 	{env, [{http_port, 5498},
