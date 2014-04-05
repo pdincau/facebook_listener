@@ -17,8 +17,8 @@
          update_with_valid_signature/1,
          update_with_invalid_signature/1]).
 
--define(BASE_URL, "http://localhost:8080/any_app").
--define(SIGNATURE, "sha1=534985d2be5f2df69cae7cc5e23be204add4f499"). % for key "test"
+-define(BASE_URL, "http://localhost:5498/any_app").
+-define(SIGNATURE, "sha1=534985d2be5f2df69cae7cc5e23be204add4f499"). % for key <<"secrete">>
 -define(JSON_UPDATE, "{\"object\":\"user\",\"entry\":[{\"uid\":1335845740,\"changed_fields\":[\"name\",\"picture\"],\"time\":232323},{\"uid\":1234,\"changed_fields\":[\"friends\"],\"time\":232325}]}").
 -define(CALLBACK_PARAMS, "?hub.mode=subscribe&hub.verify_token=token&hub.challenge=mychallenge").
 
@@ -40,9 +40,11 @@ init_per_suite(_Config) ->
     application:start(ranch),
     application:start(cowboy),
     application:start(inets),
+    application:start(facebook_listener),
     [].
 
 end_per_suite(_Config) ->
+    application:stop(facebook_listener),
     application:stop(inets),
     application:stop(cowboy),
     application:stop(ranch),
@@ -51,18 +53,10 @@ end_per_suite(_Config) ->
     ok.
 
 init_per_group(http, Config) ->
-    {ok, _} = cowboy:start_http(http, 100, [{port, 8080}], [
-            {env, [{dispatch, init_dispatch(Config)}]},
-            {max_keepalive, 50},
-            {timeout, 500}]),
     [Config].
 
 end_per_group(http, _Config) ->
     ok.
-
-%% Dispatch configuration.
-init_dispatch(_Config) ->
-    cowboy_router:compile([{"localhost", [{"/:app_name", handler, []}]}]).
 
 callback_with_missing_params(_Config) ->
     {ok, {{_, 400, _}, _, _}} = httpc:request(get, {?BASE_URL, []}, [], []),

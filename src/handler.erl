@@ -11,7 +11,6 @@
 
 -define(HUB_MODE, <<"subscribe">>).
 -define(VERIFICATION_TOKEN, <<"token">>).
--define(APP_SECRET, <<"secret">>).
 
 init(_Transport, Req, []) ->
     {ok, Req, undefined}.
@@ -75,7 +74,8 @@ handle_post_with_body(Req) ->
     end.
 
 is_valid(XHubSignature, Payload) ->
-    <<Mac:160/integer>> = crypto:hmac(sha, ?APP_SECRET, Payload),
+    {ok, AppSecret} = application:get_env(facebook_listener, app_secret),
+    <<Mac:160/integer>> = crypto:hmac(sha, AppSecret, Payload),
     Signature = lists:flatten(io_lib:format("sha1=~40.16.0b", [Mac])),
     binary_to_list(XHubSignature) =:= Signature.
 
