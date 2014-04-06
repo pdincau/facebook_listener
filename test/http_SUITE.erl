@@ -18,8 +18,8 @@
          update_with_invalid_signature/1]).
 
 -define(BASE_URL, "http://127.0.0.1:5498/any_app").
--define(SIGNATURE, "sha1=534985d2be5f2df69cae7cc5e23be204add4f499"). % for key <<"secrete">>
--define(JSON_UPDATE, "{\"object\":\"user\",\"entry\":[{\"uid\":1335845740,\"changed_fields\":[\"name\",\"picture\"],\"time\":232323},{\"uid\":1234,\"changed_fields\":[\"friends\"],\"time\":232325}]}").
+-define(SIGNATURE, "sha1=534985d2be5f2df69cae7cc5e23be204add4f499"). % for key <<"secret">>
+-define(JSON_UPDATE, "{\"object\":\"user\",\"entry\":[{\"uid\":\"1335845740\",\"changed_fields\":[\"name\",\"picture\"],\"time\":232323},{\"uid\":\"1234\",\"changed_fields\":[\"friends\"],\"time\":232325}]}").
 -define(CALLBACK_PARAMS, "?hub.mode=subscribe&hub.verify_token=token&hub.challenge=mychallenge").
 
 %% ct.
@@ -36,7 +36,7 @@ groups() ->
 
 init_per_suite(_Config) ->
     application:start(inets),
-    application:start(facebook_listener),
+    %application:start(facebook_listener),
     [].
 
 end_per_suite(_Config) ->
