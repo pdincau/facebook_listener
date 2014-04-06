@@ -19,3 +19,7 @@ include erlang.mk
 autobahn: clean clean-deps deps app build-tests
 	@mkdir -p logs/
 	@$(CT_RUN) -suite autobahn_SUITE
+
+eunit:
+	@mkdir -p logs
+	@$(CT_RUN) -suite eunit_SUITE
