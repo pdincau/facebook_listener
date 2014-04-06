@@ -2,6 +2,8 @@
 
 -behaviour(gen_server).
 
+-compile([{parse_transform, lager_transform}]).
+
 %% API
 -export([start_link/0]).
 
@@ -13,6 +15,8 @@
 
 -define(SERVER, ?MODULE).
 
+-define(IDENTIFIER, <<"{app_name}:facebook:{user_id}">>).
+
 -record(state, {client}).
 
 start_link() ->
@@ -21,7 +25,9 @@ start_link() ->
 init([]) ->
     {ok, #state{}}.
 
-handle_call({access_token, {_AppName, _UserId}}, _From, #state{client=_Client} = State) ->
+handle_call({access_token, {AppName, UserId}}, _From, #state{client=_Client} = State) ->
+    Identifier = identifier(AppName, UserId),
+    lager:info("Identifier is: ~p", [Identifier]),
     Reply = <<"securitytoken">>,
     {reply, Reply, State};
 
@@ -35,8 +41,7 @@ handle_cast(_Msg, State) ->
 handle_info(_Info, State) ->
     {noreply, State}.
 
-terminate(_Reason, #state{client=Client} = _State) ->
-    eredis:stop(Client),
+terminate(_Reason, #state{client=_Client} = _State) ->
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
@@ -47,3 +52,13 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 get_access_token(AppName, UserId) ->
     gen_server:call(?MODULE, {access_token, {AppName, UserId}}).
+
+identifier(AppName, UserId) ->
+    Bin = binary:replace(?IDENTIFIER, <<"{app_name}">>, AppName),
+    Bin1 = binary:replace(Bin, <<"{user_id}">>, UserId),
+    binary_to_list(Bin1).
+
+-ifdef(TEST).
+    -compile(export_all).
+-endif.
+
