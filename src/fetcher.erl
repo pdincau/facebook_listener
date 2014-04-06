@@ -23,7 +23,15 @@ entries_in(Update) ->
     end.
 
 fetch_entry(AppName, UserId, Fields, _Timestamp) ->
-    Token = access_token(AppName, UserId),
+    case access_token(AppName, UserId) of
+        {error, _Error} ->
+            %% TODO: _Error may be for example be about undefined token or no connection
+            ok;
+        Token ->
+            do_fetch(UserId, Fields, Token)
+    end.
+
+do_fetch(UserId, Fields, Token) ->
     %% TODO: this will make a request only for 1st field. Must be rewritten
     Url = url_for(UserId, Fields, Token, <<"limit=1">>),
     case httpc:request(Url) of
