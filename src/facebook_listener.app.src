@@ -21,5 +21,6 @@
 	{mod, {facebook_listener_app, []}},
 	{env, [{http_port, 5498},
            {repository, repo_mem},
+           {queue, queue_mem},
            {app_secret, <<"secret">>}]}
 ]}.

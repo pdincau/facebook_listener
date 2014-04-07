@@ -23,5 +23,6 @@ start_link() ->
 
 init([]) ->
     Repository = application:get_env(facebook_listener, repository, repo_mem),
-    Procs = [?CHILD(Repository, worker)],
+    Queue = application:get_env(facebook_listener, queue, queue_mem),
+    Procs = [?CHILD(Repository, worker), ?CHILD(Queue, worker)],
     {ok, {{one_for_one, 10, 10}, Procs}}.
