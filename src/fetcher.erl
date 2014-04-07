@@ -43,7 +43,7 @@ do_fetch(UserId, Field, Token) ->
     end.
 
 access_token(AppName, UserId) ->
-    repository:get_access_token(AppName, UserId).
+    gen_server:call(repository, {access_token, {AppName, UserId}}).
 
 url_for(UserId, Field, Token, Params) ->
     Url = binary:replace(?BASE_URL, <<"{objectid}">>, UserId),

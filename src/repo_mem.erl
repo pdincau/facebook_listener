@@ -1,4 +1,4 @@
--module(repository).
+-module(repo_mem).
 
 -behaviour(gen_server).
 
@@ -11,23 +11,17 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
         terminate/2, code_change/3]).
 
--export([get_access_token/2]).
-
--define(SERVER, ?MODULE).
-
 -define(IDENTIFIER, <<"{app_name}:facebook:{user_id}">>).
 
--record(state, {client}).
+-record(state, {}).
 
 start_link() ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+    gen_server:start_link({local, repository}, ?MODULE, [], []).
 
 init([]) ->
     {ok, #state{}}.
 
-handle_call({access_token, {AppName, UserId}}, _From, #state{client=_Client} = State) ->
-    Identifier = identifier(AppName, UserId),
-    lager:info("Identifier is: ~p", [Identifier]),
+handle_call({access_token, {_AppName, _UserId}}, _From, State) ->
     Reply = <<"securitytoken">>,
     {reply, Reply, State};
 
@@ -41,7 +35,7 @@ handle_cast(_Msg, State) ->
 handle_info(_Info, State) ->
     {noreply, State}.
 
-terminate(_Reason, #state{client=_Client} = _State) ->
+terminate(_Reason, _State) ->
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
@@ -50,13 +44,6 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-get_access_token(AppName, UserId) ->
-    gen_server:call(?MODULE, {access_token, {AppName, UserId}}).
-
-identifier(AppName, UserId) ->
-    Bin = binary:replace(?IDENTIFIER, <<"{app_name}">>, AppName),
-    Bin1 = binary:replace(Bin, <<"{user_id}">>, UserId),
-    binary_to_list(Bin1).
 
 -ifdef(TEST).
     -compile(export_all).

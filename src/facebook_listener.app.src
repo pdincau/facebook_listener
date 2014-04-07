@@ -6,19 +6,20 @@
 	{modules, []},
 	{registered, [facebook_listener_sup]},
 	{applications, [
-		kernel,
-		stdlib,
-        crypto,
-        asn1,
-        public_key,
-        ssl,
-		cowboy,
-		jsx,
-        inets,
- 		lager,
-        eredis
+            kernel,
+            stdlib,
+            crypto,
+            asn1,
+            public_key,
+            ssl,
+            cowboy,
+            jsx,
+            inets,
+            lager,
+            eredis
 	]},
 	{mod, {facebook_listener_app, []}},
 	{env, [{http_port, 5498},
+           {repository, repo_mem},
            {app_secret, <<"secret">>}]}
 ]}.
