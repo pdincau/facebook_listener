@@ -1,6 +1,6 @@
 PROJECT = facebook_listener
 
-CT_SUITES = eunit http
+CT_SUITES = eunit #http
 
 DEPS = cowboy jsx lager eredis
 dep_cowboy = pkg://cowboy master
