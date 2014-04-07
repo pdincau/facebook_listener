@@ -19,13 +19,22 @@ start_link() ->
     gen_server:start_link({local, repository}, ?MODULE, [], []).
 
 init([]) ->
-    {ok, #state{}}.
+    % TODO: handle possible error coming from eredis
+    % TODO: make init send gen_cast message to setup connection
+    {ok, Client} = eredis:start_link(),
+    {ok, #state{client=Client}}.
 
-handle_call({access_token, {AppName, UserId}}, _From, #state{client=_Client} = State) ->
+handle_call({access_token, {AppName, UserId}}, _From, #state{client=Client} = State) ->
     Identifier = identifier(AppName, UserId),
     lager:info("Identifier is: ~p", [Identifier]),
-    Reply = <<"securitytoken">>,
-    {reply, Reply, State};
+    [_, {ok, BCUserID}] = eredis:qp(Client, [["SELECT", 3], ["HGET", Identifier, "uuid"]]),
+    [_, {ok, Data}] = eredis:qp(Client, [["SELECT", 0], ["GET", BCUserID]]),
+    User = jsx:decode(Data),
+    lager:info("user json is: ~p", [User]),
+    Services = proplists:get_value(<<"services">>, User),
+    Facebook = proplists:get_value(<<"facebook">>, Services),
+    Token = proplists:get_value(<<"session">>, Facebook),
+    {reply, Token, State};
 
 handle_call(_Request, _From, State) ->
     Reply = ok,
