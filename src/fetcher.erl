@@ -27,7 +27,8 @@ entries_in(Update) ->
 fetch_entry(AppName, UserId, Fields, _Timestamp) ->
     case access_token(AppName, UserId) of
         {error, _Error} ->
-            %% TODO: _Error may be for example be about undefined token or no connection
+            %% TODO: _Error may be for example be about undefined token or no connection.
+            %%       We should return an error tuple.
             ok;
         Token ->
             [do_fetch(UserId, Field, Token) || Field <- Fields]
@@ -39,7 +40,9 @@ do_fetch(UserId, Field, Token) ->
         {ok, {{_, 200, _}, _Headers, Body}} ->
             Body;
         Error ->
-            lager:warning("Couldn't fetch from url: ~p~n. Response was: ~p", [Error])
+            lager:warning("Couldn't fetch from url: ~p~n. Response was: ~p", [Error]),
+            %% TODO: We should return an error tuple here probably
+            ok
     end.
 
 access_token(AppName, UserId) ->
