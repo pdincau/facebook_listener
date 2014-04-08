@@ -62,7 +62,7 @@ push(Results) ->
                     end
               end,
     Msgs = lists:dropwhile(IsError, Results),
-    [gen_server:cast(push, {msg, Msg}) || Msg <- Msgs].
+    [gen_server:cast(queue, {push, Msg}) || Msg <- Msgs].
 
 -ifdef(TEST).
     -compile(export_all).
