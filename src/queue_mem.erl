@@ -26,6 +26,7 @@ handle_call(_Request, _From, State) ->
     {reply, Reply, State}.
 
 handle_cast({push, Msg}, #state{msgs=Msgs} = State) ->
+    lager:info("New message is: ~p", [Msg]),
     NewState = State#state{msgs=[Msg|Msgs]},
     {noreply, NewState};
 
