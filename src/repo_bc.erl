@@ -24,7 +24,7 @@ init([]) ->
         {ok, Client} ->
             #state{client=Client};
         _Error ->
-            erlang:send_after(2000, repository, reconnect),
+            %% TODO: send message to self in order to retry connection
             #state{client=undefined}
     end,
     {ok, State}.
@@ -54,7 +54,8 @@ handle_cast(_Msg, State) ->
 handle_info(_Info, State) ->
     {noreply, State}.
 
-terminate(_Reason, #state{client=_Client} = _State) ->
+terminate(_Reason, #state{client=Client} = _State) ->
+    eredis:stop(Client),
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
