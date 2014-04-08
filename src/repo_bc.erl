@@ -25,7 +25,7 @@ init([]) ->
             #state{client=Client};
         _Error ->
             %% TODO: send message to self in order to retry connection
-            #state{client=undefined}
+            #state{}
     end,
     {ok, State}.
 
