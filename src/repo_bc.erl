@@ -1,4 +1,4 @@
--module(repo_redis).
+-module(repo_bc).
 
 -behaviour(gen_server).
 
