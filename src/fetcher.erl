@@ -55,13 +55,13 @@ url_for(UserId, Field, Token, Params) ->
 
 push(Results) ->
     %% TODO: this can be improved a lot
-    IsError = fun(Msg) ->
+    IsSuccess = fun(Msg) ->
                     case Msg of
                         {error, _} -> false;
                         _ -> true
                     end
               end,
-    Msgs = lists:dropwhile(IsError, Results),
+    Msgs = lists:filter(IsSuccess, Results),
     [gen_server:cast(queue, {push, Msg}) || Msg <- Msgs].
 
 -ifdef(TEST).
