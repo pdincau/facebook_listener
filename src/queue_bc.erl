@@ -37,7 +37,7 @@ handle_call(_Request, _From, State) ->
 handle_cast({push, Msg}, #state{client=Client} = State) ->
     lager:info("New message is: ~p", [Msg]),
     %% TODO: handle errors here
-    ok = memcached:set(Client, "Hello", Msg),
+    ok = memcached:set(Client, "social-web-activities", Msg),
     {noreply, State};
 
 handle_cast(_Msg, State) ->
