@@ -20,6 +20,7 @@ start_link() ->
 
 init([]) ->
     % TODO: make init send gen_cast message to setup connection
+    process_flag(trap_exit,true),
     State = case eredis:start_link() of
         {ok, Client} ->
             #state{client=Client};
