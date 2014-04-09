@@ -11,7 +11,7 @@ fetch(AppName, Update) ->
     lager:info("Entries in update are: ~p", [Entries]),
     Results = [fetch_entry(AppName, UserId, Fields, Timestamp) || {UserId, Fields, Timestamp} <- Entries],
     lager:info("Results are: ~p", [Results]),
-    push(lists:flatten(Results)).
+    push(Results).
 
 entries_in(Update) ->
     %% TODO: currently only updates with object 'user" are supported
@@ -29,7 +29,9 @@ fetch_entry(AppName, UserId, Fields, _Timestamp) ->
             {error, Error};
         Token ->
             %% TODO: Identify better error
-            [do_fetch(UserId, Field, Token) || Field <- Fields]
+            do_fetch(UserId, lists:nth(1,Fields), Token)
+	    %% handle multiple fields
+            %%[do_fetch(UserId, Field, Token) || Field <- Fields]
     end.
 
 do_fetch(UserId, Field, Token) ->
