@@ -30,7 +30,7 @@ fetch_entry(AppName, UserId, Fields, _Timestamp) ->
         Token ->
             %% TODO: Identify better error
             do_fetch(UserId, lists:nth(1,Fields), Token)
-	    %% handle multiple fields
+            %% handle multiple fields
             %%[do_fetch(UserId, Field, Token) || Field <- Fields]
     end.
 
