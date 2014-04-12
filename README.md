@@ -30,7 +30,7 @@ $ ./start.sh
 You can also start/stop the release using:
 
 ``` bash
-$ ./_rel/bin/facebokk_listener [start|stop]
+$ ./_rel/bin/facebook_listener [start|stop]
 ```
 
 ### Run the tests:
