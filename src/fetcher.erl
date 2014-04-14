@@ -2,16 +2,17 @@
 
 -compile([{parse_transform, lager_transform}]).
 
--export([fetch/2]).
+-export([fetch/2, fetch/3]).
 
 -define(BASE_URL, <<"https://graph.facebook.com/{objectid}/{field}?access_token={token}&{params}">>).
 
 fetch(AppName, Update) ->
+    fetch(AppName, Update, fun push/1).
+
+fetch(AppName, Update, Fun) ->
     Entries = entries_in(Update),
     lager:info("Entries in update are: ~p", [Entries]),
-    Results = [fetch_entry(AppName, UserId, Fields, Timestamp) || {UserId, Fields, Timestamp} <- Entries],
-    lager:info("Results are: ~p", [Results]),
-    push(Results).
+    [fetch_entry(AppName, UserId, Fields, Timestamp, Fun) || {UserId, Fields, Timestamp} <- Entries].
 
 entries_in(Update) ->
     %% TODO: currently only updates with object 'user" are supported
@@ -23,15 +24,14 @@ entries_in(Update) ->
             []
     end.
 
-fetch_entry(AppName, UserId, Fields, _Timestamp) ->
+fetch_entry(AppName, UserId, Fields, _Timestamp, Fun) ->
     case access_token(AppName, UserId) of
         {error, Error} ->
             {error, Error};
         Token ->
             %% TODO: Identify better error
-            do_fetch(UserId, lists:nth(1,Fields), Token)
-            %% handle multiple fields
-            %%[do_fetch(UserId, Field, Token) || Field <- Fields]
+            Results = [do_fetch(UserId, Field, Token) || Field <- Fields],
+            [Fun(Result) || Result <- Results]
     end.
 
 do_fetch(UserId, Field, Token) ->
@@ -55,16 +55,11 @@ url_for(UserId, Field, Token, Params) ->
     Url3 = binary:replace(Url2, <<"{params}">>, Params),
     binary_to_list(Url3).
 
-push(Results) ->
-    %% TODO: this can be improved a lot
-    IsSuccess = fun(Msg) ->
-                    case Msg of
-                        {error, _} -> false;
-                        _ -> true
-                    end
-              end,
-    Msgs = lists:filter(IsSuccess, Results),
-    [gen_server:cast(queue, {push, Msg}) || Msg <- Msgs].
+push({error, fetch}) ->
+    ok;
+
+push(Msg) ->
+    gen_server:cast(queue, {push, Msg}).
 
 -ifdef(TEST).
     -compile(export_all).
