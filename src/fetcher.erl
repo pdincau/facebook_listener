@@ -27,9 +27,9 @@ entries_in(Update) ->
 fetch_entry(AppName, UserId, Fields, _Timestamp, Fun) ->
     case access_token(AppName, UserId) of
         {error, Error} ->
+            %% TODO: Identify better error
             {error, Error};
         Token ->
-            %% TODO: Identify better error
             Results = [do_fetch(UserId, Field, Token) || Field <- Fields],
             [Fun(Result) || Result <- Results]
     end.
@@ -40,8 +40,8 @@ do_fetch(UserId, Field, Token) ->
         {ok, {{_, 200, _}, _Headers, Body}} ->
             Body;
         Error ->
-            lager:warning("Couldn't fetch from url: ~p~n. Response was: ~p", [Error]),
             %% TODO: Identify better error
+            lager:warning("Couldn't fetch from url: ~p~n. Response was: ~p", [Error]),
             {error, fetch}
     end.
 
