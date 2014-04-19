@@ -20,8 +20,8 @@ fetch_entry(AppName, Entry, Fun) ->
         {error, Error} ->
             {error, Error};
         {token, Token} ->
-            Results = [do_fetch(UId, Field, Token) || Field <- ChangedFields],
-            [Fun(Result) || Result <- Results]
+            SocialActivities = [do_fetch(UId, Field, Token) || Field <- ChangedFields],
+            [Fun(Activity) || Activity <- SocialActivities]
     end.
 
 do_fetch(UserId, Field, Token) ->
@@ -48,5 +48,5 @@ url_for(UserId, Field, Token, Params) ->
 push({error, fetch}) ->
     ok;
 
-push(Msg) ->
-    gen_server:cast(queue, {push, Msg}).
+push(Activity) ->
+    gen_server:cast(queue, {push, Activity}).
