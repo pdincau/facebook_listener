@@ -20,7 +20,7 @@ init([]) ->
     {ok, #state{}}.
 
 handle_call({access_token, {_AppName, _UserId}}, _From, State) ->
-    Reply = <<"securitytoken">>,
+    Reply = {token, <<"securitytoken">>},
     {reply, Reply, State};
 
 handle_call(_Request, _From, State) ->
@@ -46,4 +46,3 @@ code_change(_OldVsn, State, _Extra) ->
 -ifdef(TEST).
     -compile(export_all).
 -endif.
-

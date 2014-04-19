@@ -2,35 +2,25 @@
 
 -compile([{parse_transform, lager_transform}]).
 
--export([fetch/2, fetch/3]).
+-export([handle/2, handle/3]).
 
 -define(BASE_URL, <<"https://graph.facebook.com/{objectid}/{field}?access_token={token}&{params}">>).
 
-fetch(AppName, Update) ->
-    fetch(AppName, Update, fun push/1).
+handle(AppName, Update) ->
+    handle(AppName, Update, fun push/1).
 
-fetch(AppName, Update, Fun) ->
-    Entries = entries_in(Update),
+handle(AppName, Update, Fun) ->
+    Entries = parser:entries_in(Update),
     lager:info("Entries in update are: ~p", [Entries]),
-    [fetch_entry(AppName, UserId, Fields, Timestamp, Fun) || {UserId, Fields, Timestamp} <- Entries].
+    [fetch_entry(AppName, Entry, Fun) || Entry <- Entries].
 
-entries_in(Update) ->
-    %% TODO: currently only updates with object 'user" are supported
-    case Update of
-        [{<<"object">>, Object = <<"user">>}, {<<"entry">>, Entries}] ->
-            lager:info("Extracted from update: ~p object: ~p and entries: ~p", [Update, Object, Entries]),
-            [{UId, Fields, Timestamp} ||  [{<<"uid">>, UId}, {<<"id">>, _Id}, {<<"time">>, Timestamp}, {<<"changed_fields">>, Fields}] <- Entries];
-        _ ->
-            []
-    end.
-
-fetch_entry(AppName, UserId, Fields, _Timestamp, Fun) ->
-    case access_token(AppName, UserId) of
+fetch_entry(AppName, Entry, Fun) ->
+    {UId, ChangedFields, _Time} = parser:values_in(Entry),
+    case access_token(AppName, UId) of
         {error, Error} ->
-            %% TODO: Identify better error
             {error, Error};
-        Token ->
-            Results = [do_fetch(UserId, Field, Token) || Field <- Fields],
+        {token, Token} ->
+            Results = [do_fetch(UId, Field, Token) || Field <- ChangedFields],
             [Fun(Result) || Result <- Results]
     end.
 
@@ -60,7 +50,3 @@ push({error, fetch}) ->
 
 push(Msg) ->
     gen_server:cast(queue, {push, Msg}).
-
--ifdef(TEST).
-    -compile(export_all).
--endif.

@@ -65,7 +65,7 @@ handle_post_with_body(Req) ->
             {AppName, Req4} = cowboy_req:binding(app_name, Req3),
             lager:info("App name is: ~s", [AppName]),
 
-            spawn(fun() -> fetcher:fetch(AppName, Update) end),
+            spawn(fun() -> fetcher:handle(AppName, Update) end),
 
             cowboy_req:reply(200, [], <<"">>, Req4);
         false ->
