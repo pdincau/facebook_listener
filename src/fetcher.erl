@@ -25,7 +25,7 @@ fetch_entry(AppName, Entry, Fun) ->
     end.
 
 do_fetch(UserId, Field, Token) ->
-    Url = url_for(UserId, Field, Token, <<"limit=1">>),
+    Url = url_for(UserId, Field, Token),
     case httpc:request(Url) of
         {ok, {{_, 200, _}, _Headers, Body}} ->
             Body;
@@ -37,6 +37,12 @@ do_fetch(UserId, Field, Token) ->
 
 access_token(AppName, UserId) ->
     gen_server:call(repository, {access_token, {AppName, UserId}}).
+
+url_for(UserId, <<"likes">>, Token) ->
+    url_for(UserId, <<"likes">>, Token, <<"">>);
+
+url_for(UserId, Field, Token) ->
+    url_for(UserId, Field, Token, <<"limit=1">>).
 
 url_for(UserId, Field, Token, Params) ->
     Url = binary:replace(?BASE_URL, <<"{objectid}">>, UserId),
