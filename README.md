@@ -41,9 +41,9 @@ You can subscribe to Facebook updates by running by running something like:
 1> subscriber:subscribe(Object, CallbackUrl, Fields).
 ```
 
-where all the parameters are binaries and the fiels are comma-separated (e.g. <<"feed,likes">>)  
+where all the parameters are binaries and the fiels are comma-separated (e.g. `<<"feed,likes">>`)  
 
-You can also check your current subscriptions by running_
+You can also check your current subscriptions by running:
 
 ```bash
 1> subscriber:subscriptions().
