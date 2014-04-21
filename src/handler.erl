@@ -3,8 +3,6 @@
 %% @doc Facebook Real-time updates handler.
 -module(handler).
 
--compile([{parse_transform, lager_transform}]).
-
 -export([init/3]).
 -export([handle/2]).
 -export([terminate/3]).
@@ -26,16 +24,16 @@ reply(<<"GET">>, Req) ->
 
     {ok, ExpectedToken} = application:get_env(facebook_listener, verification_token),
 
-    lager:info("Handling request with params:~nmode: ~s,~nverify token: ~s,~nchallenge: ~s", [Mode, VerifyToken, Challenge]),
+    io:format("Handling request with params:~nmode: ~p,~nverify token: ~p,~nchallenge: ~p~n", [Mode, VerifyToken, Challenge]),
     case {Mode, VerifyToken, Challenge} of
         {_, _, undefined} ->
-            lager:warning("Parameter 'hub.challenge' missing during subscription call from Facebook"),
+            io:format("Parameter 'hub.challenge' missing during subscription call from Facebook~n"),
             cowboy_req:reply(400, Req);
         {?HUB_MODE, ExpectedToken, Challenge} ->
-            lager:info("Valid subscription received from Facebook"),
+            io:format("Valid subscription received from Facebook~n"),
             cowboy_req:reply(200, [], Challenge, Req4);
         {_, _, _} ->
-            lager:warning("Wrong parameters or missing paramenters during subscription call from Facebook"),
+            io:format("Wrong parameters or missing paramenters during subscription call from Facebook~n"),
             cowboy_req:reply(400, Req)
     end;
 
@@ -45,32 +43,31 @@ reply(<<"POST">>, Req) ->
         true ->
             handle_post_with_body(Req);
         false ->
-            lager:warning("Update notification without body received"),
+            io:format("Update notification without body received~n"),
             cowboy_req:reply(400, Req)
     end;
 
 reply(_, Req) ->
-    lager:warning("HTTP request with invalid method received"),
     cowboy_req:reply(405, Req).
 
 handle_post_with_body(Req) ->
     {XHubSignature, Req2} = cowboy_req:header(<<"x-hub-signature">>, Req),
     {ok, [{Payload, true}], Req3} = cowboy_req:body_qs(Req2),
-    lager:info("Received update: ~p", [Payload]),
+    io:format("Received update: ~p~n", [Payload]),
 
     case is_valid(XHubSignature, Payload) of
         true ->
             Update = jsx:decode(Payload),
-            lager:info("Received request is facebook update: ~p", [Update]),
+            io:format("Received request is facebook update: ~p~n", [Update]),
 
             {AppName, Req4} = cowboy_req:binding(app_name, Req3),
-            lager:info("App name is: ~s", [AppName]),
+            io:format("App name is: ~p~n", [AppName]),
 
             spawn(fun() -> fetcher:handle(AppName, Update) end),
 
             cowboy_req:reply(200, [], <<"">>, Req4);
         false ->
-            lager:warning("Update notification with invalid signature received."),
+            io:format("Update notification with invalid signature received.~n"),
             cowboy_req:reply(400, Req)
     end.
 

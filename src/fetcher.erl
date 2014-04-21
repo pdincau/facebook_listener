@@ -1,7 +1,5 @@
 -module(fetcher).
 
--compile([{parse_transform, lager_transform}]).
-
 -export([handle/2, handle/3]).
 
 -define(BASE_URL, <<"https://graph.facebook.com/{objectid}/{field}?access_token={token}&{params}">>).
@@ -11,7 +9,7 @@ handle(AppName, Update) ->
 
 handle(AppName, Update, Fun) ->
     Entries = parser:entries_in(Update),
-    lager:info("Entries in update are: ~p", [Entries]),
+    io:format("Entries in update are: ~p~n", [Entries]),
     [fetch_entry(AppName, Entry, Fun) || Entry <- Entries].
 
 fetch_entry(AppName, Entry, Fun) ->
@@ -31,7 +29,7 @@ do_fetch(UserId, Field, Token) ->
             Body;
         Error ->
             %% TODO: Identify better error
-            lager:warning("Couldn't fetch. Response was: ~p", [Error]),
+            io:format("Couldn't fetch update. Response was: ~p~n", [Error]),
             {error, fetch}
     end.
 

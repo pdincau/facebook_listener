@@ -14,7 +14,7 @@ subscriptions() ->
         {ok, {{_, 200, _}, _Headers, Body}} ->
             Body;
         Error ->
-            io:format("Couldn't update subscriptions. Response was: ~p", [Error]),
+            io:format("Couldn't update subscriptions. Response was: ~p~n", [Error]),
             {error, Error}
     end.
 
@@ -30,7 +30,7 @@ subscribe(Object, CallbackUrl, Fields) ->
         {ok, {{_, 200, _}, _Headers, _Body}} ->
             ok;
         Error ->
-            io:format("Couldn't update subscriptions. Response was: ~p", [Error]),
+            io:format("Couldn't update subscriptions. Response was: ~p~n", [Error]),
             {error, Error}
     end.
 

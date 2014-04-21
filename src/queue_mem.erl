@@ -26,7 +26,7 @@ handle_call(_Request, _From, State) ->
     {reply, Reply, State}.
 
 handle_cast({push, Msg}, #state{msgs=Msgs} = State) ->
-    lager:info("New message is: ~p", [Msg]),
+    io:format("New message is: ~p~n", [Msg]),
     NewState = State#state{msgs=[Msg|Msgs]},
     {noreply, NewState};
 
@@ -45,4 +45,3 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-

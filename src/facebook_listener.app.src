@@ -14,8 +14,7 @@
             ssl,
             cowboy,
             jsx,
-            inets,
-            lager
+            inets
 	]},
 	{mod, {facebook_listener_app, []}},
 	{env, [{http_port, 5498},
