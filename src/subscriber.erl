@@ -2,8 +2,6 @@
 
 -export([subscriptions/0, subscribe/3]).
 
--compile([{parse_transform, lager_transform}]).
-
 -define(BASE_URL, <<"https://graph.facebook.com/{appid}/subscriptions?access_token={appid}|{secret}">>).
 -define(BASE_BODY, <<"object={object}&callback_url={callback_url}&fields={fields}&verify_token={token}">>).
 -define(VERIFICATION_TOKEN, <<"token">>).
@@ -16,7 +14,7 @@ subscriptions() ->
         {ok, {{_, 200, _}, _Headers, Body}} ->
             Body;
         Error ->
-            lager:warning("Couldn't fetch subscriptions. Response was: ~p", [Error]),
+            io:format("Couldn't update subscriptions. Response was: ~p", [Error]),
             {error, Error}
     end.
 
@@ -26,13 +24,13 @@ subscribe(Object, CallbackUrl, Fields) ->
     Url = url_for(AppId, AppSecret),
 
     {ok, Token} = application:get_env(facebook_listener, verification_token),
-    Body = body_for(Object, CallbackUrl, Fields, Token),
+    RequestBody = body_for(Object, CallbackUrl, Fields, Token),
 
-    case httpc:request(post, {Url, [], "", Body}, [], []) of
-        {ok, {{_, 200, _}, _Headers, Body}} ->
-            Body;
+    case httpc:request(post, {Url, [], "", RequestBody}, [], []) of
+        {ok, {{_, 200, _}, _Headers, _Body}} ->
+            ok;
         Error ->
-            lager:warning("Couldn't update subscriptions. Response was: ~p", [Error]),
+            io:format("Couldn't update subscriptions. Response was: ~p", [Error]),
             {error, Error}
     end.
 
