@@ -46,7 +46,19 @@ where all the parameters are binaries and the fiels are comma-separated (e.g. `<
 You can also check your current subscriptions by running:
 
 ```bash
-1> subscriber:subscriptions().
+2> subscriber:subscriptions().
+```
+
+You can unsubscribe from all updates running:
+
+```bash
+3> subscriber:unsubscribe(<<"">>).
+```
+
+You can also unsubscribe from a specific updates (e.g. `user`) running:
+
+```bash
+3> subscriber:unsubscribe(<<"object=user">>).
 ```
 
 ### Run the tests:
