@@ -21,6 +21,7 @@
 	{env, [{http_port, 5498},
            {repository, repo_mem},
            {queue, queue_mem},
+           {verification_token, <<"token">>},
            {app_secret, <<"secret">>},
            {app_id, <<"appid">>}]}
 ]}.

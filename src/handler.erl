@@ -10,7 +10,6 @@
 -export([terminate/3]).
 
 -define(HUB_MODE, <<"subscribe">>).
--define(VERIFICATION_TOKEN, <<"token">>).
 
 init(_Transport, Req, []) ->
     {ok, Req, undefined}.
@@ -25,12 +24,14 @@ reply(<<"GET">>, Req) ->
     {VerifyToken, Req3} = cowboy_req:qs_val(<<"hub.verify_token">>, Req2),
     {Challenge, Req4} = cowboy_req:qs_val(<<"hub.challenge">>, Req3),
 
+    {ok, ExpectedToken} = application:get_env(facebook_listener, verification_token),
+
     lager:info("Handling request with params:~nmode: ~s,~nverify token: ~s,~nchallenge: ~s", [Mode, VerifyToken, Challenge]),
     case {Mode, VerifyToken, Challenge} of
         {_, _, undefined} ->
             lager:warning("Parameter 'hub.challenge' missing during subscription call from Facebook"),
             cowboy_req:reply(400, Req);
-        {?HUB_MODE, ?VERIFICATION_TOKEN, Challenge} ->
+        {?HUB_MODE, ExpectedToken, Challenge} ->
             lager:info("Valid subscription received from Facebook"),
             cowboy_req:reply(200, [], Challenge, Req4);
         {_, _, _} ->
