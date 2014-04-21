@@ -1,6 +1,6 @@
 -module(subscriber).
 
--export([subscriptions/0, subscribe/3]).
+-export([subscriptions/0, subscribe/3, unsubscribe/1]).
 
 -define(BASE_URL, <<"https://graph.facebook.com/{appid}/subscriptions?access_token={appid}|{secret}">>).
 -define(BASE_BODY, <<"object={object}&callback_url={callback_url}&fields={fields}&verify_token={token}">>).
@@ -31,6 +31,19 @@ subscribe(Object, CallbackUrl, Fields) ->
             ok;
         Error ->
             io:format("Couldn't update subscriptions. Response was: ~p~n", [Error]),
+            {error, Error}
+    end.
+
+unsubscribe(Objects) ->
+    {ok, AppId} = application:get_env(facebook_listener, app_id),
+    {ok, AppSecret} = application:get_env(facebook_listener, app_secret),
+    Url = url_for(AppId, AppSecret),
+
+    case httpc:request(delete, {Url, [], "", Objects}, [], []) of
+        {ok, {{_, 200, _}, _Headers, Body}} ->
+            Body;
+        Error ->
+            io:format("Couldn't unsubscribe. Response was: ~p~n", [Error]),
             {error, Error}
     end.
 
