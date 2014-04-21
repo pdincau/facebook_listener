@@ -35,7 +35,7 @@ $ ./_rel/bin/facebook_listener [start|stop]
 
 ### Subscribe to Facebook updates:
 
-You can subscribe to Facebook updates by running by running something like:
+You can [`subscribe`](https://developers.facebook.com/docs/graph-api/reference/app/subscriptions/ "Subscriptions") to Facebook updates by running by running something like:
 
 ```bash
 1> subscriber:subscribe(Object, CallbackUrl, Fields).
