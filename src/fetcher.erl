@@ -31,7 +31,7 @@ do_fetch(UserId, Field, Token) ->
             Body;
         Error ->
             %% TODO: Identify better error
-            lager:warning("Couldn't fetch from url: ~p~n. Response was: ~p", [Error]),
+            lager:warning("Couldn't fetch. Response was: ~p", [Error]),
             {error, fetch}
     end.
 
