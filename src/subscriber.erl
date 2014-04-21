@@ -3,7 +3,8 @@
 -export([subscriptions/0, subscribe/3]).
 
 -define(BASE_URL, <<"https://graph.facebook.com/{appid}/subscriptions?access_token={appid}|{secret}">>).
--define(BASE_BODY, <<"object={object}&callback_url={callback_url}&fields={fields}&verify_token=token">>).
+-define(BASE_BODY, <<"object={object}&callback_url={callback_url}&fields={fields}&verify_token={token}">>).
+-define(VERIFICATION_TOKEN, <<"token">>).
 
 subscriptions() ->
     {ok, AppId} = application:get_env(facebook_listener, app_id),
@@ -41,4 +42,5 @@ body_for(Object, CallbackUrl, Fields) ->
     Body = binary:replace(?BASE_BODY, <<"{object}">>, Object),
     Body1 = binary:replace(Body, <<"{callback_url}">>, CallbackUrl),
     Body2 = binary:replace(Body1, <<"{fields}">>, Fields),
-    binary_to_list(Body2).
+    Body3 = binary:replace(Body2, <<"{token}">>, ?VERIFICATION_TOKEN),
+    binary_to_list(Body3).
