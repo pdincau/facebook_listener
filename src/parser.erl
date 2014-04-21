@@ -16,11 +16,11 @@ values_in(Entry) ->
     ChangedFields = proplists:get_value(<<"changed_fields">>, Entry),
     {UId, ChangedFields, Time}.
 
+next(Activity) when is_binary(Activity) ->
+    Paging = proplists:get_value(<<"paging">>, jsx:decode(Activity)),
+    proplists:get_value(<<"next">>, Paging);
+
 next(Activity) ->
     BinActivity = list_to_binary(Activity),
     Paging = proplists:get_value(<<"paging">>, jsx:decode(BinActivity)),
-    proplists:get_value(<<"next">>, Paging);
-
-next(Activity) when is_binary(Activity) ->
-    Paging = proplists:get_value(<<"paging">>, jsx:decode(Activity)),
     proplists:get_value(<<"next">>, Paging).
