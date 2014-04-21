@@ -33,6 +33,22 @@ You can also start/stop the release using:
 $ ./_rel/bin/facebook_listener [start|stop]
 ```
 
+### Subscribe to Facebook updates:
+
+You can subscribe to Facebook updates by running by running something like:
+
+```bash
+1> subscriber:subscribe(Object, CallbackUrl, Fields).
+```
+
+where all the parameters are binaries and the fiels are comma-separated (e.g. <<"feed,likes">>)  
+
+You can also check your current subscriptions by running_
+
+```bash
+1> subscriber:subscriptions().
+```
+
 ### Run the tests:
 
 
