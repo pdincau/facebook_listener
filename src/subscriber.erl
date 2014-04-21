@@ -2,6 +2,8 @@
 
 -export([subscriptions/0, subscribe/3]).
 
+-compile([{parse_transform, lager_transform}]).
+
 -define(BASE_URL, <<"https://graph.facebook.com/{appid}/subscriptions?access_token={appid}|{secret}">>).
 -define(BASE_BODY, <<"object={object}&callback_url={callback_url}&fields={fields}&verify_token={token}">>).
 -define(VERIFICATION_TOKEN, <<"token">>).
