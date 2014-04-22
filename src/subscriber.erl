@@ -19,31 +19,24 @@ subscriptions() ->
     end.
 
 subscribe(Object, CallbackUrl, Fields) ->
-    {ok, AppId} = application:get_env(facebook_listener, app_id),
-    {ok, AppSecret} = application:get_env(facebook_listener, app_secret),
-    Url = url_for(AppId, AppSecret),
-
     {ok, Token} = application:get_env(facebook_listener, verification_token),
     RequestBody = body_for(Object, CallbackUrl, Fields, Token),
 
-    case httpc:request(post, {Url, [], "", RequestBody}, [], []) of
-        {ok, {{_, 200, _}, _Headers, _Body}} ->
-            ok;
-        Error ->
-            io:format("Couldn't update subscriptions. Response was: ~p~n", [Error]),
-            {error, Error}
-    end.
+    do_request(post, RequestBody).
 
 unsubscribe(Objects) ->
+    do_request(delete, Objects).
+
+do_request(Verb, Body) ->
     {ok, AppId} = application:get_env(facebook_listener, app_id),
     {ok, AppSecret} = application:get_env(facebook_listener, app_secret),
     Url = url_for(AppId, AppSecret),
 
-    case httpc:request(delete, {Url, [], "", Objects}, [], []) of
-        {ok, {{_, 200, _}, _Headers, Body}} ->
-            Body;
+    case httpc:request(Verb, {Url, [], "", Body}, [], []) of
+        {ok, {{_, 200, _}, _Headers, ResponseBody}} ->
+            ResponseBody;
         Error ->
-            io:format("Couldn't unsubscribe. Response was: ~p~n", [Error]),
+            io:format("Couldn't update subscriptions. Response was: ~p~n", [Error]),
             {error, Error}
     end.
 

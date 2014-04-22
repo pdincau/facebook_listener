@@ -41,7 +41,7 @@ You can [`subscribe`](https://developers.facebook.com/docs/graph-api/reference/a
 1> subscriber:subscribe(Object, CallbackUrl, Fields).
 ```
 
-where all the parameters are binaries and the fiels are comma-separated (e.g. `<<"feed,likes">>`)  
+where all the parameters are binaries and the fiels are comma-separated (e.g. `<<"feed,likes">>`)
 
 You can also check your current subscriptions by running:
 
@@ -60,6 +60,8 @@ You can also unsubscribe from a specific updates (e.g. `user`) running:
 ```bash
 3> subscriber:unsubscribe(<<"object=user">>).
 ```
+
+For both `subscribe/3`and `unsubscribe/1` the result will be `"null"` in case of success.
 
 ### Run the tests:
 
