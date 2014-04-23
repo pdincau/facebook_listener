@@ -14,7 +14,7 @@ subscriptions() ->
         {ok, {{_, 200, _}, _Headers, Body}} ->
             Body;
         Error ->
-            io:format("Couldn't update subscriptions. Response was: ~p~n", [Error]),
+            error_logger:error_report(["Couldn't update subscriptions.", {error, Error}]),
             {error, Error}
     end.
 
@@ -36,7 +36,7 @@ do_request(Verb, Body) ->
         {ok, {{_, 200, _}, _Headers, ResponseBody}} ->
             ResponseBody;
         Error ->
-            io:format("Couldn't complete. Response was: ~p~n", [Error]),
+            error_logger:error_report(["Couldn't complete request.", {error, Error}]),
             {error, Error}
     end.
 
