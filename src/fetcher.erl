@@ -9,7 +9,7 @@ handle(AppName, Update) ->
 
 handle(AppName, Update, Fun) ->
     Entries = parser:entries_in(Update),
-    io:format("Entries in update are: ~p~n", [Entries]),
+    error_logger:info_report(["Entries in update", {entries, Entries}]),
     [fetch_entry(AppName, Entry, Fun) || Entry <- Entries].
 
 fetch_entry(AppName, Entry, Fun) ->
@@ -29,7 +29,7 @@ do_fetch(UserId, Field, Token) ->
             Body;
         Error ->
             %% TODO: Identify better error
-            io:format("Couldn't fetch update. Response was: ~p~n", [Error]),
+            error_logger:info_report(["Couldn't fetch update. Response was:", {response, Error}]),
             {error, fetch}
     end.
 
