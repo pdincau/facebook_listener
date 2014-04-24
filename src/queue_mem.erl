@@ -26,7 +26,7 @@ handle_call(_Request, _From, State) ->
     {reply, Reply, State}.
 
 handle_cast({push, Msg}, #state{msgs=Msgs} = State) ->
-    io:format("New message is: ~p~n", [Msg]),
+    error_logger:info_report(["Message pushed to queue", {msg, Msg}]),
     NewState = State#state{msgs=[Msg|Msgs]},
     {noreply, NewState};
 
