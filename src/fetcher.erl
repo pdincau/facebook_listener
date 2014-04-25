@@ -57,8 +57,7 @@ url_for(UserId, Field, Token, Params) ->
 
 params_for(Since) ->
     Params = binary:replace(?PARAMS, <<"{since}">>, Since),
-    Params1 = binary:replace(Params, <<"{until}">>, <<"">>),
-    binary_to_list(Params1).
+    binary:replace(Params, <<"{until}">>, <<"">>).
 
 push({error, fetch}) ->
     ok;
