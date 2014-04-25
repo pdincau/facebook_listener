@@ -24,16 +24,16 @@ reply(<<"GET">>, Req) ->
 
     {ok, ExpectedToken} = application:get_env(facebook_listener, verification_token),
 
-    io:format("Handling request with params:~nmode: ~p,~nverify token: ~p,~nchallenge: ~p~n", [Mode, VerifyToken, Challenge]),
+    error_logger:info_report(["Handling request with params", {mode, "mode"}, {token, "token"}, {challenge, Challenge}]),
     case {Mode, VerifyToken, Challenge} of
         {_, _, undefined} ->
-            io:format("Parameter 'hub.challenge' missing during subscription call from Facebook~n"),
+            error_logger:warning_report("Parameter 'hub.challenge' missing during subscription call from Facebook"),
             cowboy_req:reply(400, Req);
         {?HUB_MODE, ExpectedToken, Challenge} ->
-            io:format("Valid subscription received from Facebook~n"),
+            error_logger:info_report("Valid subscription received from Facebook"),
             cowboy_req:reply(200, [], Challenge, Req4);
         {_, _, _} ->
-            io:format("Wrong parameters or missing paramenters during subscription call from Facebook~n"),
+            error_logger:warning_report("Wrong or missing parameters during subscription call from Facebook"),
             cowboy_req:reply(400, Req)
     end;
 
@@ -43,7 +43,6 @@ reply(<<"POST">>, Req) ->
         true ->
             handle_post_with_body(Req);
         false ->
-            io:format("Update notification without body received~n"),
             cowboy_req:reply(400, Req)
     end;
 
@@ -53,21 +52,19 @@ reply(_, Req) ->
 handle_post_with_body(Req) ->
     {XHubSignature, Req2} = cowboy_req:header(<<"x-hub-signature">>, Req),
     {ok, [{Payload, true}], Req3} = cowboy_req:body_qs(Req2),
-    io:format("Received update: ~p~n", [Payload]),
 
     case is_valid(XHubSignature, Payload) of
         true ->
             Update = jsx:decode(Payload),
-            io:format("Received request is facebook update: ~p~n", [Update]),
+            error_logger:info_report(["Received update", {update, Update}]),
 
             {AppName, Req4} = cowboy_req:binding(app_name, Req3),
-            io:format("App name is: ~p~n", [AppName]),
 
             spawn(fun() -> fetcher:handle(AppName, Update) end),
 
             cowboy_req:reply(200, [], <<"">>, Req4);
         false ->
-            io:format("Update notification with invalid signature received.~n"),
+            error_logger:info_report("Update notification with invalid signature received"),
             cowboy_req:reply(400, Req)
     end.
 
