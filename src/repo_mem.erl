@@ -22,7 +22,7 @@ handle_call({access_token, {_AppName, _UserId}}, _From, State) ->
     {reply, Reply, State};
 
 handle_call({last_timestamp, _UserId}, _From, State) ->
-    Reply = {timestamp, <<"1398006309">>},
+    Reply = <<"1398006309">>,
     {reply, Reply, State};
 
 handle_call(_Request, _From, State) ->
