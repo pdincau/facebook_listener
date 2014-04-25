@@ -3,6 +3,7 @@
 -export([handle/2, handle/3]).
 
 -define(BASE_URL, <<"https://graph.facebook.com/{objectid}/{field}?access_token={token}&{params}">>).
+-define(PARAMS, <<"since={since}&until={until}">>).
 
 handle(AppName, Update) ->
     handle(AppName, Update, fun push/1).
@@ -36,11 +37,16 @@ do_fetch(UserId, Field, Token) ->
 access_token(AppName, UserId) ->
     gen_server:call(repository, {access_token, {AppName, UserId}}).
 
+last_timestamp(UserId) ->
+    gen_server:call(repository, {last_timestamp, UserId}).
+
 url_for(UserId, <<"likes">>, Token) ->
     url_for(UserId, <<"likes">>, Token, <<"">>);
 
 url_for(UserId, Field, Token) ->
-    url_for(UserId, Field, Token, <<"limit=1">>).
+    Since = last_timestamp(UserId),
+    Params = params_for(Since),
+    url_for(UserId, Field, Token, Params).
 
 url_for(UserId, Field, Token, Params) ->
     Url = binary:replace(?BASE_URL, <<"{objectid}">>, UserId),
@@ -48,6 +54,11 @@ url_for(UserId, Field, Token, Params) ->
     Url2 = binary:replace(Url1, <<"{token}">>, Token),
     Url3 = binary:replace(Url2, <<"{params}">>, Params),
     binary_to_list(Url3).
+
+params_for(Since) ->
+    Params = binary:replace(?PARAMS, <<"{since}">>, Since),
+    Params1 = binary:replace(Params, <<"{until}">>, <<"">>),
+    binary_to_list(Params1).
 
 push({error, fetch}) ->
     ok;

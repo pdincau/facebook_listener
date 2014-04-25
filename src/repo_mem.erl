@@ -21,6 +21,10 @@ handle_call({access_token, {_AppName, _UserId}}, _From, State) ->
     Reply = {token, <<"securitytoken">>},
     {reply, Reply, State};
 
+handle_call({last_timestamp, _UserId}, _From, State) ->
+    Reply = {timestamp, <<"1398006309">>},
+    {reply, Reply, State};
+
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
