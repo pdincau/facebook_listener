@@ -71,3 +71,10 @@ To run the tests:
 ``` bash
 $ make tests
 ```
+
+To run only unit tests:
+
+``` bash
+$ make test_eunit
+```
+
