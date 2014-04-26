@@ -12,12 +12,3 @@ dep_ct_helper = https://github.com/extend/ct_helper.git master
 # Standard targets.
 include erlang.mk
 
-
-# Extra targets.
-autobahn: clean clean-deps deps app build-tests
-	@mkdir -p logs/
-	@$(CT_RUN) -suite autobahn_SUITE
-
-eunit:
-	@mkdir -p logs
-	@$(CT_RUN) -suite eunit_SUITE
