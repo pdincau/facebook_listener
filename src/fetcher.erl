@@ -61,7 +61,8 @@ last_timestamp(UserId) ->
     gen_server:call(repository, {last_timestamp, UserId}).
 
 update_timestamp(UserId, Timestamp) ->
-    gen_server:cast(repository, {new_timestamp, UserId, Timestamp}).
+    BinTimestamp = integer_to_binary(Timestamp),
+    gen_server:cast(repository, {new_timestamp, UserId, BinTimestamp}).
 
 push({error, fetch}) ->
     ok;
