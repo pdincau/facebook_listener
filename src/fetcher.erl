@@ -14,12 +14,13 @@ handle(AppName, Update, Fun) ->
     [fetch_entry(AppName, Entry, Fun) || Entry <- Entries].
 
 fetch_entry(AppName, Entry, Fun) ->
-    {UId, ChangedFields, _Time} = parser:values_in(Entry),
+    {UId, ChangedFields, Time} = parser:values_in(Entry),
     case access_token(AppName, UId) of
         {error, Error} ->
             {error, Error};
         {token, Token} ->
             SocialActivities = [do_fetch(UId, Field, Token) || Field <- ChangedFields],
+            update_timestamp(UId, Time),
             [Fun(Activity) || Activity <- SocialActivities]
     end.
 
@@ -33,12 +34,6 @@ do_fetch(UserId, Field, Token) ->
             error_logger:info_report(["Couldn't fetch update. Response was:", {response, Error}]),
             {error, fetch}
     end.
-
-access_token(AppName, UserId) ->
-    gen_server:call(repository, {access_token, {AppName, UserId}}).
-
-last_timestamp(UserId) ->
-    gen_server:call(repository, {last_timestamp, UserId}).
 
 url_for(UserId, <<"likes">>, Token) ->
     url_for(UserId, <<"likes">>, Token, <<"">>);
@@ -58,6 +53,15 @@ url_for(UserId, Field, Token, Params) ->
 params_for(Since) ->
     Params = binary:replace(?PARAMS, <<"{since}">>, Since),
     binary:replace(Params, <<"{until}">>, <<"">>).
+
+access_token(AppName, UserId) ->
+    gen_server:call(repository, {access_token, {AppName, UserId}}).
+
+last_timestamp(UserId) ->
+    gen_server:call(repository, {last_timestamp, UserId}).
+
+update_timestamp(UserId, Timestamp) ->
+    gen_server:cast(repository, {new_timestamp, UserId, Timestamp}).
 
 push({error, fetch}) ->
     ok;
