@@ -18,7 +18,7 @@
          update_with_invalid_signature/1]).
 
 -define(BASE_URL, "http://127.0.0.1:5498/any_app").
--define(SIGNATURE, "sha1=534985d2be5f2df69cae7cc5e23be204add4f499"). % for key <<"secret">>
+-define(SIGNATURE, "sha1=a30d1d735f9f25940d37cdce557fdaa199045241"). % for key <<"secret">>
 -define(JSON_UPDATE, "{\"object\":\"user\",\"entry\":[{\"uid\":\"1335845740\",\"changed_fields\":[\"name\",\"picture\"],\"time\":232323},{\"uid\":\"1234\",\"changed_fields\":[\"friends\"],\"time\":232325}]}").
 -define(CALLBACK_PARAMS, "?hub.mode=subscribe&hub.verify_token=token&hub.challenge=mychallenge").
 
@@ -35,13 +35,13 @@ groups() ->
     [{http, [parallel], Tests}].
 
 init_per_suite(_Config) ->
-    application:start(inets),
+    start_deps(),
+    error_logger:tty(false),
     application:start(facebook_listener),
     [].
 
 end_per_suite(_Config) ->
     application:stop(facebook_listener),
-    application:stop(inets),
     ok.
 
 init_per_group(http, Config) ->
@@ -69,3 +69,15 @@ update_with_valid_signature(_Config) ->
 update_with_invalid_signature(_Config) ->
     {ok, {{_, 400, _}, _, _}} = httpc:request(post, {?BASE_URL, [{"x-hub-signature", "invalid"}], "application/json", ?JSON_UPDATE}, [], []),
     ok.
+
+start_deps() ->
+    application:start(crypto),
+    application:start(asn1),
+    application:start(public_key),
+    application:start(ssl),
+    application:start(ranch),
+    application:start(cowlib),
+    application:start(cowboy),
+    application:start(jsx),
+    application:start(inets).
+
