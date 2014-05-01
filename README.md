@@ -66,10 +66,16 @@ For both `subscribe/3`and `unsubscribe/1` the result will be `"null"` in case of
 ### Run the tests:
 
 
-To run the tests:
+To run all the tests:
 
 ``` bash
 $ make tests
+```
+
+To run only handler tests:
+
+```bash
+$ make test_http
 ```
 
 To run only unit tests:
